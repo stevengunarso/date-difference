@@ -25,10 +25,10 @@ class DateDifferences {
 	 * First Challenge: Find how many days of difference between the dates
 	 *
 	 * @since	1.0.0
-	 * @return	int		The date difference in number of days 
-	 * @uses	strtotime 
-	 * @uses	abs 
-	 * @uses	intval 
+	 * @return	int			The date difference in number of days 
+	 * @uses	strtotime 	Since PHP 4
+	 * @uses	abs  		Since PHP 4
+	 * @uses	intval  	Since PHP 4
 	 **/
 	public function first_challenge() {
 		$first_date_seconds = strtotime($this->first_date);
@@ -42,6 +42,49 @@ class DateDifferences {
 		$day_difference = intval( $difference / 3600 / 24);
 
 		return $day_difference;
+	}
+
+	/**
+	 * Second Challenge: Find how many weekdays (working days) between the dates 
+	 *
+	 * @since	1.0.0
+	 * @return	int					The number of weekdays 
+	 * @uses	strtotime 			Since PHP 4
+	 * @uses	DateTime   			Since PHP 5.2
+	 * @uses	DateInterval   		Since PHP 5.3
+	 * @uses	DatePeriod  		Since PHP 5.3
+	 * @uses	DateTime::format 	Since PHP 5.2.1 
+	 **/
+	public function second_challenge() {
+		
+		# Instantiate the DateTime objects
+		# In this case, we need to ensure that the second date object is always the "Later" date compared to first date object
+		if( strtotime($this->first_date) < strtotime($this->second_date) ) {
+			$first_date_object = new DateTime($this->first_date);
+	        $second_date_object = new DateTime($this->second_date);
+		}
+		else {
+			$first_date_object = new DateTime($this->second_date);
+	        $second_date_object = new DateTime($this->first_date);
+		}
+
+        # Date Interval class is utilised to allows a for loop of the range
+        $interval = new DateInterval('P1D');
+
+        # Generate a Date Range based on the dates and interval
+        $date_range = new DatePeriod($first_date_object, $interval, $second_date_object);
+
+        # Finally, count the weekdays between the interval
+        # $date->format("N") will return the day as numbers, e.g. Monday is 1, Sunday is 7
+        $total_days = 0;
+        foreach ($date_range as $date) {
+
+         	if ( $date->format("N") >= 1 && $date->format("N") < 6 ) {
+                $total_days++; 
+          	}
+        }
+        
+        return $total_days;
 	}
 
 	/**

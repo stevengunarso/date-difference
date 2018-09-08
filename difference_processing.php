@@ -29,5 +29,8 @@ if( empty($first_date) OR empty($second_date) ) {
 $date_diff = new DateDifferences($first_date, $second_date);
 
 # First challenge
-echo "First Challenge: The difference is " . $date_diff->first_challenge() . " Days";
+echo "First Challenge: The difference is " . $date_diff->first_challenge() . " Days" . "<br/>";
+
+# Second challenge
+echo "Second Challenge: The number of weekdays is " . $date_diff->second_challenge() . " Days" . "<br/>";
 ?>
