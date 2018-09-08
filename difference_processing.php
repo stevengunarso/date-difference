@@ -33,4 +33,7 @@ echo "First Challenge: The difference is " . $date_diff->first_challenge() . " D
 
 # Second challenge
 echo "Second Challenge: The number of weekdays is " . $date_diff->second_challenge() . " Days" . "<br/>";
+
+# Third challenge
+echo "Third Challenge: The number of full weeks is " . $date_diff->third_challenge() . " Weeks" . "<br/>";
 ?>

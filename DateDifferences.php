@@ -88,6 +88,34 @@ class DateDifferences {
 	}
 
 	/**
+	 * Third Challenge: Find how many complete weeks between the dates
+	 * 
+	 * Note: I am unsure what "complete weeks" means in this case.
+	 * I understand that it could mean any 7 days interval between dates or "Monday to Sunday" sets.
+	 * 
+	 * Assumptions: The simpler definition of "complete weeks" is the correct one (7 days interval).
+	 *
+	 * @since	1.0.0
+	 * @return	int			The date difference in number of days 
+	 * @uses	strtotime 	Since PHP 4
+	 * @uses	abs  		Since PHP 4
+	 * @uses	intval  	Since PHP 4
+	 **/
+	public function third_challenge() {
+		$first_date_seconds = strtotime($this->first_date);
+		$second_date_seconds = strtotime($this->second_date);
+
+		# Abs is used here because it because first date and second date are not "chronological"
+		# Therefore the second date might be in the "past" in comparison to first date
+		$difference = abs($first_date_seconds - $second_date_seconds);
+
+		# convert back the differences in seconds to days
+		$week_difference = intval( $difference / 3600 / 24 / 7);
+
+		return $week_difference;
+	}
+
+	/**
 	 * Getter Function for First Date
 	 *
 	 * @since	1.0.0
