@@ -20,20 +20,20 @@ if( !empty($_POST["second_date"]) ) {
 	$second_date = $_POST["second_date"];
 }
 
+if( !empty($_POST["interval_conversion"]) ) {
+	$interval_conversion = $_POST["interval_conversion"];
+}
+else {
+	$interval_conversion = NULL;
+}
+
 # Stop processing if one of the required dates is missing 
 if( empty($first_date) OR empty($second_date) ) {
 	die("Please fill both date parameters!");
 }
 
 # Initialise the Date Differences class
-$date_diff = new DateDifferences($first_date, $second_date);
+$date_diff = new DateDifferences($first_date, $second_date, $interval_conversion);
 
-# First challenge
-echo "First Challenge: The difference is " . $date_diff->first_challenge() . " Days" . "<br/>";
-
-# Second challenge
-echo "Second Challenge: The number of weekdays is " . $date_diff->second_challenge() . " Days" . "<br/>";
-
-# Third challenge
-echo "Third Challenge: The number of full weeks is " . $date_diff->third_challenge() . " Weeks" . "<br/>";
+$date_diff->output_calculations();
 ?>

@@ -10,15 +10,20 @@
  */
 class DateDifferences {
 	private $first_date, $second_date;
+	private $interval_conversion;
 
 	/**
 	 * Class constructor. Called when an object of this class is instantiated.
 	 * 
 	 * @since	1.0.0
+	 * @param	string	$first_date				First date formatted in "human-friendly" string
+	 * @param	string	$second_date			Second date formatted in "human-friendly" string
+	 * @param	string	$interval_conversion	Conversion metric - Possible Values: seconds, minutes, hours, days, years
 	 */
-	public function __construct($first_date, $second_date) {
+	public function __construct($first_date, $second_date, $interval_conversion) {
 		$this->first_date = $first_date;
 		$this->second_date = $second_date;
+		$this->interval_conversion = $interval_conversion;
 	}
 
 	/**
@@ -29,8 +34,9 @@ class DateDifferences {
 	 * @uses	strtotime 	Since PHP 4
 	 * @uses	abs  		Since PHP 4
 	 * @uses	intval  	Since PHP 4
+ 	 * @used-by self::output_calculations()
 	 **/
-	public function first_challenge() {
+	private function first_challenge() {
 		$first_date_seconds = strtotime($this->first_date);
 		$second_date_seconds = strtotime($this->second_date);
 
@@ -54,8 +60,9 @@ class DateDifferences {
 	 * @uses	DateInterval   		Since PHP 5.3
 	 * @uses	DatePeriod  		Since PHP 5.3
 	 * @uses	DateTime::format 	Since PHP 5.2.1 
+ 	 * @used-by self::output_calculations()
 	 **/
-	public function second_challenge() {
+	private function second_challenge() {
 		
 		# Instantiate the DateTime objects
 		# In this case, we need to ensure that the second date object is always the "Later" date compared to first date object
@@ -100,8 +107,9 @@ class DateDifferences {
 	 * @uses	strtotime 	Since PHP 4
 	 * @uses	abs  		Since PHP 4
 	 * @uses	intval  	Since PHP 4
+ 	 * @used-by self::output_calculations()
 	 **/
-	public function third_challenge() {
+	private function third_challenge() {
 		$first_date_seconds = strtotime($this->first_date);
 		$second_date_seconds = strtotime($this->second_date);
 
@@ -153,6 +161,90 @@ class DateDifferences {
 	 **/
 	public function set_second_date($second_date) {
 		$this->second_date = $second_date;
+	}
+
+	/**
+	 * Getter Function for Interval Conversion
+	 *
+	 * @since	1.0.0
+	 * @return	string		The Interval Conversion value
+	 **/
+	public function get_interval_conversion() {
+		return $this->interval_conversion;
+	}
+
+	/**
+	 * Setter Function for Interval Conversion.
+	 *
+	 * @since	1.0.0
+	 * @param	string	$second_date		Interval Conversion String
+	 **/
+	public function set_interval_conversion($interval_conversion) {
+		$this->interval_conversion = $interval_conversion;
+	}
+
+	/**
+	 * Calculation output function used to output the 3 calculations into the front-end.
+	 * 
+	 * Note: This function is utilised to provide a single point of input-output on the Fourth Challenge (conversions) 
+	 *
+	 * @since	1.0.0
+	 * @uses	self::first_challenge()
+	 * @uses	self::second_challenge()
+	 * @uses	self::third_challenge()
+	 * @uses	self::convert_calculation_result()
+	 * 
+	 **/
+	public function output_calculations() {
+		# First challenge
+		echo "First Challenge: The difference is " . $this->convert_calculation_result($this->first_challenge()) . 
+			" " . (!empty($this->interval_conversion) ? $this->interval_conversion : "days") . "<br/>";
+
+		# Second challenge
+		echo "Second Challenge: The number of weekdays is " . $this->convert_calculation_result($this->second_challenge()) . 
+			" " . (!empty($this->interval_conversion) ? $this->interval_conversion : "days") . "<br/>";
+
+		# Third challenge
+		echo "Third Challenge: The number of full weeks is " . $this->convert_calculation_result($this->third_challenge(), "weeks") . 
+			" " . (!empty($this->interval_conversion) ? $this->interval_conversion : "weeks") . "<br/>";
+	}
+
+	/**
+	 * Fourth Challenge - Calculation conversion function.
+	 *
+	 * @since	1.0.0
+	 * @param	int	$result					Interval Calculations Results
+	 * @param	string	$original_metric	String of Metric used within the calculation
+	 * @return	int							The conversion result
+ 	 * @used-by self::convert_calculation_result()
+	 *
+	 **/
+	public function convert_calculation_result($result, $original_metric = "days") {
+		# Only convert when the original calculation metric is not the same as the conversion interval metric
+		if( $this->interval_conversion == "" || $original_metric == $this->interval_conversion ) {
+			return $result;
+		}
+
+		# convert the results to number of days - especially important for results from Third Challenge
+		if( $original_metric == "weeks") {
+			$result = $result * 7;
+		}
+
+		if( $this->interval_conversion == "seconds" ) {
+			$result = $result * 24 * 3600;
+		}
+		else if( $this->interval_conversion == "minutes" ) {
+			$result = $result * 24 * 60;
+		}
+		else if( $this->interval_conversion == "hours" ) {
+			$result = $result * 24;
+		}
+		else if( $this->interval_conversion == "years" ) {
+			# For the sake of simplicity, we will ignore leap years for now
+			$result = intval($result / 365);
+		}
+
+		return $result;
 	}
 }
 ?>
