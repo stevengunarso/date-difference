@@ -22,6 +22,29 @@ class DateDifferences {
 	}
 
 	/**
+	 * First Challenge: Find how many days of difference between the dates
+	 *
+	 * @since	1.0.0
+	 * @return	int		The date difference in number of days 
+	 * @uses	strtotime 
+	 * @uses	abs 
+	 * @uses	intval 
+	 **/
+	public function first_challenge() {
+		$first_date_seconds = strtotime($this->first_date);
+		$second_date_seconds = strtotime($this->second_date);
+
+		# Abs is used here because it because first date and second date are not "chronological"
+		# Therefore the second date might be in the "past" in comparison to first date
+		$difference = abs($first_date_seconds - $second_date_seconds);
+
+		# convert back the differences in seconds to days
+		$day_difference = intval( $difference / 3600 / 24);
+
+		return $day_difference;
+	}
+
+	/**
 	 * Getter Function for First Date
 	 *
 	 * @since	1.0.0

@@ -27,4 +27,7 @@ if( empty($first_date) OR empty($second_date) ) {
 
 # Initialise the Date Differences class
 $date_diff = new DateDifferences($first_date, $second_date);
+
+# First challenge
+echo "First Challenge: The difference is " . $date_diff->first_challenge() . " Days";
 ?>
