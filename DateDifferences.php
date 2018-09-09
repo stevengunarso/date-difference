@@ -9,7 +9,7 @@
  * @used-by difference_processing.php
  */
 class DateDifferences {
-	private $first_date, $second_date;
+	private $first_date, $second_date, $first_timezone, $second_timezone;
 	private $interval_conversion;
 
 	/**
@@ -19,11 +19,17 @@ class DateDifferences {
 	 * @param	string	$first_date				First date formatted in "human-friendly" string
 	 * @param	string	$second_date			Second date formatted in "human-friendly" string
 	 * @param	string	$interval_conversion	Conversion metric - Possible Values: seconds, minutes, hours, days, years
+	 * @param	string	$first_timezone			First Timezone to be used
+	 * @param	string	$second_timezone		Second Timezone to be used
 	 */
-	public function __construct($first_date, $second_date, $interval_conversion) {
+	public function __construct($first_date, $second_date, $interval_conversion, 
+		$first_timezone = "Australia/Melbourne", $second_timezone = "Australia/Melbourne") {
+
 		$this->first_date = $first_date;
 		$this->second_date = $second_date;
 		$this->interval_conversion = $interval_conversion;
+		$this->first_timezone = $first_timezone;
+		$this->second_timezone = $second_timezone;
 	}
 
 	/**
@@ -31,14 +37,19 @@ class DateDifferences {
 	 *
 	 * @since	1.0.0
 	 * @return	int			The date difference in number of days 
-	 * @uses	strtotime 	Since PHP 4
-	 * @uses	abs  		Since PHP 4
-	 * @uses	intval  	Since PHP 4
+	 * @uses	DateTime 			Since PHP 5.2
+	 * @uses	DateTime::format 	Since PHP 5.2.1
+	 * @uses	DateTimeZone 		Since PHP 5.2.0
+	 * @uses	abs  				Since PHP 4
+	 * @uses	intval  			Since PHP 4
  	 * @used-by self::output_calculations()
 	 **/
 	private function first_challenge() {
-		$first_date_seconds = strtotime($this->first_date);
-		$second_date_seconds = strtotime($this->second_date);
+		$first_date = new DateTime($this->first_date, new DateTimeZone($this->first_timezone));
+		$first_date_seconds = $first_date->format('U');
+
+		$second_date = new DateTime($this->second_date, new DateTimeZone($this->second_timezone));
+		$second_date_seconds = $second_date->format('U');
 
 		# Abs is used here because it because first date and second date are not "chronological"
 		# Therefore the second date might be in the "past" in comparison to first date
@@ -51,12 +62,16 @@ class DateDifferences {
 	}
 
 	/**
-	 * Second Challenge: Find how many weekdays (working days) between the dates 
+	 * Second Challenge: Find how many weekdays (working days) between the dates
+	 * 
 	 *
 	 * @since	1.0.0
 	 * @return	int					The number of weekdays 
 	 * @uses	strtotime 			Since PHP 4
-	 * @uses	DateTime   			Since PHP 5.2
+	 * @uses	DateTime 			Since PHP 5.2
+	 * @uses	DateTime::format 	Since PHP 5.2.1
+	 * @uses	DateTime::modify 	Since PHP 5.2.0
+	 * @uses	DateTimeZone 		Since PHP 5.2.0
 	 * @uses	DateInterval   		Since PHP 5.3
 	 * @uses	DatePeriod  		Since PHP 5.3
 	 * @uses	DateTime::format 	Since PHP 5.2.1 
@@ -65,21 +80,30 @@ class DateDifferences {
 	private function second_challenge() {
 		
 		# Instantiate the DateTime objects
+		$first_date = new DateTime($this->first_date, new DateTimeZone($this->first_timezone));
+		$second_date = new DateTime($this->second_date, new DateTimeZone($this->second_timezone));
+
 		# In this case, we need to ensure that the second date object is always the "Later" date compared to first date object
-		if( strtotime($this->first_date) < strtotime($this->second_date) ) {
-			$first_date_object = new DateTime($this->first_date);
-	        $second_date_object = new DateTime($this->second_date);
-		}
-		else {
-			$first_date_object = new DateTime($this->second_date);
-	        $second_date_object = new DateTime($this->first_date);
+		# Initiate the swap
+		if( $first_date->format('U') > $second_date->format('U') ) {
+			$temp = $first_date;
+			$first_date = $second_date;
+			$second_date = $temp;
 		}
 
         # Date Interval class is utilised to allows a for loop of the range
         $interval = new DateInterval('P1D');
 
+        # Close a weakness on the code where the Date Interval not taking the "time" differences into account 
+        $time_diff = $second_date->format('U') - $first_date->format('U');
+        $time_diff = $time_diff % (3600 * 24);
+
+        if( $time_diff ) {
+        	$second_date->modify("-1 day");
+        }
+
         # Generate a Date Range based on the dates and interval
-        $date_range = new DatePeriod($first_date_object, $interval, $second_date_object);
+        $date_range = new DatePeriod($first_date, $interval, $second_date);
 
         # Finally, count the weekdays between the interval
         # $date->format("N") will return the day as numbers, e.g. Monday is 1, Sunday is 7
@@ -104,14 +128,19 @@ class DateDifferences {
 	 *
 	 * @since	1.0.0
 	 * @return	int			The date difference in number of days 
-	 * @uses	strtotime 	Since PHP 4
+	 * @uses	DateTime 			Since PHP 5.2
+	 * @uses	DateTime::format 	Since PHP 5.2.1
+	 * @uses	DateTimeZone 		Since PHP 5.2.0
 	 * @uses	abs  		Since PHP 4
 	 * @uses	intval  	Since PHP 4
  	 * @used-by self::output_calculations()
 	 **/
 	private function third_challenge() {
-		$first_date_seconds = strtotime($this->first_date);
-		$second_date_seconds = strtotime($this->second_date);
+		$first_date = new DateTime($this->first_date, new DateTimeZone($this->first_timezone));
+		$first_date_seconds = $first_date->format('U');
+
+		$second_date = new DateTime($this->second_date, new DateTimeZone($this->second_timezone));
+		$second_date_seconds = $second_date->format('U');
 
 		# Abs is used here because it because first date and second date are not "chronological"
 		# Therefore the second date might be in the "past" in comparison to first date
@@ -181,6 +210,46 @@ class DateDifferences {
 	 **/
 	public function set_interval_conversion($interval_conversion) {
 		$this->interval_conversion = $interval_conversion;
+	}
+
+	/**
+	 * Getter Function for First Timezone
+	 *
+	 * @since	1.0.0
+	 * @return	string		The timezone string
+	 **/
+	public function get_first_timezone() {
+		return $this->first_timezone;
+	}
+
+	/**
+	 * Setter Function for First Timezone.
+	 *
+	 * @since	1.0.0
+	 * @param	string	$first_timezone		The timezone string
+	 **/
+	public function set_first_timezone($first_timezone) {
+		$this->first_timezone = $first_timezone;
+	}
+
+	/**
+	 * Getter Function for Second Timezone
+	 *
+	 * @since	1.0.0
+	 * @return	string		The timezone string
+	 **/
+	public function get_second_timezone() {
+		return $this->second_timezone;
+	}
+
+	/**
+	 * Setter Function for Second Timezone.
+	 *
+	 * @since	1.0.0
+	 * @param	string	$first_timezone		The timezone string
+	 **/
+	public function set_second_timezone($second_timezone) {
+		$this->second_timezone = $second_timezone;
 	}
 
 	/**
