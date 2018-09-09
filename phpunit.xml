@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors = "true" verbase="true" stopOnFailure="false">
+
+	<testsuites>
+		<testsuite name="Date Differences Test Suite">
+			<directory>Test/</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
