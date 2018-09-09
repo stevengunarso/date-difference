@@ -36,13 +36,21 @@ function start_challenge() {
 		$interval_conversion = NULL;
 	}
 
+	if( !empty($_POST["first_timezone"]) ) {
+		$first_timezone = $_POST["first_timezone"];
+	}
+
+	if( !empty($_POST["second_timezone"]) ) {
+		$second_timezone = $_POST["second_timezone"];
+	}
+
 	# Stop processing if one of the required dates is missing 
 	if( empty($first_date) OR empty($second_date) ) {
 		die("Please fill both date parameters!");
 	}
 
 	# Initialise the Date Differences class
-	$date_diff = new DateDifferences($first_date, $second_date, $interval_conversion);
+	$date_diff = new DateDifferences($first_date, $second_date, $interval_conversion, $first_timezone, $second_timezone);
 
 	$date_diff->output_calculations();
 }
